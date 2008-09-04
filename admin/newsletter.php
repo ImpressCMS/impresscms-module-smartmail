@@ -42,6 +42,8 @@ $sortby = "newsletter_name";
 $order = "ASC";
 
 $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
+$id = isset($_REQUEST['newsletter_id']) ? intval($_REQUEST['newsletter_id']) : $id;
+
 $op = isset($_REQUEST['op']) ? $_REQUEST['op'] : ($id > 0 ? "details" : "list");
 
 switch ($op) {
@@ -51,56 +53,22 @@ switch ($op) {
 		smart_xoops_cp_header();
 		smart_adminMenu(0);
 
-        $xoopsTpl->assign('typetitle', $typetitle);
-        $criteria = new CriteriaCompo();
+		smart_collapsableBar('newsletter_list', _NL_AM_NEWSLETTERS_LIST, _NL_AM_NEWSLETTERS_LIST_DSC);
 
-        $count = $handler->getCount($criteria);
-        $start = isset($_REQUEST['start']) ? intval($_REQUEST['start']) : 0;
-        $limit = 20;
-        $criteria->setStart($start);
-        $criteria->setLimit($limit);
-        if (isset($sortby) && $sortby != "") {
-            $criteria->setSort($sortby);
-            $criteria->setOrder($order);
-        }
-        $objects =& $handler->getObjects($criteria, true, false);
-        unset($criteria);
-        if (count($objects) > 0) {
-            $xoopsTpl->assign('objects', $objects);
-            $criteria = new Criteria('newsletterid', "(".implode(',', array_keys($objects)).")", "IN");
-            $criteria->setGroupby("newsletterid");
-            $subscriber_handler = xoops_getmodulehandler('subscriber');
-            $xoopsTpl->assign('receiver_counts', $subscriber_handler->getCount($criteria));
-			$xoopsTpl->assign('user_count', $subscriber_handler->getUsersCount() );
-			$xoopsTpl->assign('alluser_count', $subscriber_handler->getUsersCount(false) );
-        }
-        $smartOption['template_main'] = $typetemplate;
-
-        if ($count > $limit) {
-            include_once XOOPS_ROOT_PATH."/class/pagenav.php";
-            $nav = new XoopsPageNav($count, $limit, $start, "start");
-            $xoopsTpl->assign("pagenav", $nav->renderNav(20));
-        }
-
-		/**
-		 * Implementing the SmartObject Table
-		 * Tobe continued...
-		 */
-		 /*
 		include_once SMARTOBJECT_ROOT_PATH."class/smartobjecttable.php";
 		$objectTable = new SmartObjectTable($handler);
-		$objectTable->addColumn(new SmartObjectColumn('name'));
-		$objectTable->addColumn(new SmartObjectColumn('description'));
-//		$objectTable->addColumn(new SmartObjectColumn(_AM_SOBJECT_SENT_TAGS_FROM, $align='left', $width=false, 'getFromInfo'));
+		$objectTable->addColumn(new SmartObjectColumn('newsletter_name', 'left', 150, 'getNewsletterAdminLink'));
+		$objectTable->addColumn(new SmartObjectColumn('newsletter_description'));
 
-
-		$objectTable->setDefaultSort('newsletter_id');
-
-		$objectTable->addIntroButton('addtag', 'newsletter.php?op=new', _NL_AM_CREATE_NEWSLETTER);
+		$objectTable->addIntroButton('additem', 'newsletter.php?op=new', _NL_AM_NEWSLETTER_ADD);
+		$objectTable->addCustomAction('getNewsletterRulesLink');
+		$objectTable->addCustomAction('getNewsletterDispatchesLink');
+		$objectTable->addCustomAction('getNewsletterBlocksLink');
+		$objectTable->addCustomAction('getNewsletterSubscribersLink');
 
 		$objectTable->render();
-		*/
 
+		smart_close_collapsable('listview_items');
 
         break;
 
@@ -114,22 +82,22 @@ switch ($op) {
         $form->display();
         break;
 
-    case "edit":
-        if (!isset($_REQUEST['id'])) {
+    case "mod":
+        if (!$id) {
             redirect_header('index.php', 2, _NL_AM_NOSELECTION);
         }
 
 		smart_xoops_cp_header();
 		smart_adminMenu(0);
 
-        $obj =& $handler->get($_REQUEST['id']);
+        $obj =& $handler->get($id);
         $form =& $obj->getForm(false, _EDIT." ".$typetitle);
         $form->display();
         break;
 
     case "save":
-        if (isset($_REQUEST['id'])) {
-            $obj =& $handler->get($_REQUEST['id']);
+        if (isset($id)) {
+            $obj =& $handler->get($id);
         }
         else {
             $obj =& $handler->create();
@@ -148,8 +116,8 @@ switch ($op) {
         }
         break;
 
-    case "delete":
-        $obj =& $handler->get($_REQUEST['id']);
+    case "del":
+        $obj =& $handler->get($id);
         if (isset($_REQUEST['ok']) && $_REQUEST['ok'] == 1) {
             if ($handler->delete($obj)) {
                 redirect_header('newsletter.php?op=list', 3, sprintf(_NL_AM_DELETEDSUCCESS, $typetitle));

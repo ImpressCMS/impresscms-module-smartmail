@@ -11,7 +11,10 @@ define("_NL_AM_BLOCKS", "Blocks");
 
 // Newsletter
 define("_NL_AM_NEWSLETTER", "Newsletter");
+define("_NL_AM_NEWSLETTERS_LIST", "Newsletters List");
+define("_NL_AM_NEWSLETTERS_LIST_DSC", "Here is a list of all newsletters available on the site.");
 define("_NL_AM_SUBSCRIBERS", "Subscribers");
+define("_NL_AM_NEWSLETTER_ADD", "Add Newsletter");
 
 define("_NL_AM_NEWSLETTERRULE", "Rule");
 define("_NL_AM_NEWSLETTERRULES", "Rules");

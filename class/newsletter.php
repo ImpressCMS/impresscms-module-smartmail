@@ -39,17 +39,46 @@ if (!class_exists('SmartObject')) {
 class SmartmailNewsletter extends SmartObject {
     var $nl_prefix = "smartmail_nltpl_";
 
-    function SmartmailNewsletter() {
-        $this->initVar("newsletter_id", XOBJ_DTYPE_INT);
-        $this->initVar("newsletter_name", XOBJ_DTYPE_TXTBOX, "", true);
-        $this->initVar("newsletter_description", XOBJ_DTYPE_TXTAREA);
-        $this->initVar('newsletter_template', XOBJ_DTYPE_TXTBOX);
-        $this->initVar('newsletter_from_name', XOBJ_DTYPE_TXTBOX);
-        $this->initVar('newsletter_from_email', XOBJ_DTYPE_TXTBOX);
-        $this->initVar('newsletter_email', XOBJ_DTYPE_TXTBOX);
-        $this->initVar('newsletter_confirm_text', XOBJ_DTYPE_TXTAREA);
-        $this->initVar('newsletter_type', XOBJ_DTYPE_INT);
+    function SmartmailNewsletter(&$handler) {
+
+    	$this->SmartObject($handler);
+
+        $this->quickInitVar("newsletter_id", XOBJ_DTYPE_INT);
+        $this->quickInitVar("newsletter_name", XOBJ_DTYPE_TXTBOX, true, _NL_AM_NAME);
+        $this->quickInitVar("newsletter_description", XOBJ_DTYPE_TXTAREA, false, _NL_AM_DESCRIPTION);
+        $this->quickInitVar('newsletter_template', XOBJ_DTYPE_TXTBOX, false, _NL_AM_TEMPLATE);
+        $this->quickInitVar('newsletter_from_name', XOBJ_DTYPE_TXTBOX, false, _NL_AM_FROMNAME);
+        $this->quickInitVar('newsletter_from_email', XOBJ_DTYPE_TXTBOX, false, _NL_AM_FROMEMAIL);
+        $this->quickInitVar('newsletter_email', XOBJ_DTYPE_TXTBOX, false, _NL_AM_EMAIL);
+        $this->quickInitVar('newsletter_confirm_text', XOBJ_DTYPE_TXTAREA, false, _NL_AM_CONFIRM_TEXT);
+        $this->quickInitVar('newsletter_type', XOBJ_DTYPE_INT, false, _NL_AM_NL_TYPE, _NL_AM_NL_TYPE_DSC);
     }
+
+    function getNewsletterAdminLink() {
+    	$ret = $this->getVar('newsletter_name');
+    	return $ret;
+    }
+
+    function getNewsletterRulesLink() {
+		$ret = '<a href="' . SMARTMAIL_ADMIN_URL . 'newsletter.php?id=' . $this->id() . '"><img src="' . SMARTOBJECT_IMAGES_ACTIONS_URL . 'configure.png" style="vertical-align: middle;" alt="' . _NL_AM_NEWSLETTERRULES . '" title="' . _NL_AM_NEWSLETTERRULES . '" /></a>';
+		return $ret;
+    }
+
+    function getNewsletterDispatchesLink() {
+		$ret = '<a href="' . SMARTMAIL_ADMIN_URL . 'dispatchlist.php?id=' . $this->id() . '"><img src="' . SMARTOBJECT_IMAGES_ACTIONS_URL . 'klipper_dock2.png" style="vertical-align: middle;" alt="' . _NL_AM_DISPATCHES . '" title="' . _NL_AM_DISPATCHES . '" /></a>';
+		return $ret;
+    }
+
+    function getNewsletterBlocksLink() {
+		$ret = '<a href="' . SMARTMAIL_ADMIN_URL . 'blocks.php?id=' . $this->id() . '"><img src="' . SMARTOBJECT_IMAGES_ACTIONS_URL . 'view_remove.png" style="vertical-align: middle;" alt="' . _NL_AM_BLOCKS . '" title="' . _NL_AM_BLOCKS . '" /></a>';
+		return $ret;
+    }
+
+	function getNewsletterSubscribersLink() {
+		$ret = '<a href="' . SMARTMAIL_ADMIN_URL . 'subscribers.php?id=' . $this->id() . '"><img src="' . SMARTOBJECT_IMAGES_ACTIONS_URL . 'people.png" style="vertical-align: middle;" alt="' . _NL_AM_SUBSCRIBERS . '" title="' . _NL_AM_SUBSCRIBERS . '" /></a>';
+		return $ret;
+    }
+
 
     /**
     * Get a {@link XoopsForm} object for creating/editing objects
