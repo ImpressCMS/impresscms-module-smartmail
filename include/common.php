@@ -16,6 +16,9 @@ if( !defined("SMARTMAIL_DIRNAME") ){
 if( !defined("SMARTMAIL_URL") ){
 	define("SMARTMAIL_URL", XOOPS_URL.'/modules/'.SMARTMAIL_DIRNAME.'/');
 }
+if( !defined("SMARTMAIL_ADMIN_URL") ){
+	define("SMARTMAIL_ADMIN_URL", XOOPS_URL.'/modules/'.SMARTMAIL_DIRNAME.'/admin/');
+}
 if( !defined("SMARTMAIL_ROOT_PATH") ){
 	define("SMARTMAIL_ROOT_PATH", XOOPS_ROOT_PATH.'/modules/'.SMARTMAIL_DIRNAME.'/');
 }
