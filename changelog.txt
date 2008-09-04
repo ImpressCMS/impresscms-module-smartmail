@@ -1,0 +1,9 @@
+<b><u>=> Version 0.8.1 Beta (Unreleased)</u></b>
+
+- Fixed : Small fixes in navigation for a smoother interface
+- Fixed : Dispatch subject defaults to newsletter name, if not set
+- Added : Dynamic template listing (smartmail_nltpl_xxx.html automatically loaded)
+
+<b><u>=> Version 0.8 Alpha (2006-09-27)</u></b>
+
+- First public release

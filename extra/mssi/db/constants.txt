@@ -1,0 +1,18 @@
+
+Job Status:
+
+0 - Submitted
+1 - In Process
+2 - Completed
+8 - Suspended
+9 - Failed
+
+Subscriber Status:
+
+0 - Submitted
+1 - In Process
+2 - Completed
+4 - Soft Bounce
+5 - Hard Bounce
+9 - Failed
+
