@@ -51,7 +51,7 @@ switch ($op) {
     case "list":
 
 		smart_xoops_cp_header();
-		smart_adminMenu(0);
+		smart_adminMenu(0, _NL_AM_NEWSLETTERS_LIST);
 
 		smart_collapsableBar('newsletter_list', _NL_AM_NEWSLETTERS_LIST, _NL_AM_NEWSLETTERS_LIST_DSC);
 
@@ -134,14 +134,27 @@ switch ($op) {
         }
         break;
 
+	case 'view':
+
+		smart_xoops_cp_header();
+		smart_adminMenu(0);
+
+        $newsletter = $handler->get($id);
+		smart_collapsableBar('newsletter_details', sprintf(_NL_AM_NEWSLETTERS_DETAILS, $newsletter->getVar('newsletter_name')) . ' ' . $newsletter->getEditItemLink());
+        $newsletter->displaySingleObject();
+		smart_close_collapsable('newsletter_details');
+
+
+		break;
+
     case "details":
 
 		smart_xoops_cp_header();
 		smart_adminMenu(0);
 
         $newsletter = $handler->get($id);
-        $newsletter_arr = $newsletter->toArray();
 
+        $newsletter_arr = $newsletter->toArray();
         $xoopsTpl->assign('newsletter', $newsletter_arr);
 
         $rule_handler = xoops_getmodulehandler('rule');
@@ -205,7 +218,9 @@ switch ($op) {
 //        $dispatch_example->setVar('newsletterid', $id);
 //        $xoopsTpl->assign('output', $dispatch_example->build(true));
 
+		smart_collapsableBar('newsletter_rules', sprintf(_NL_AM_NEWSLETTERS_RULES, $newsletter->getVar('newsletter_name')) . ' ' . $newsletter->getEditItemLink(), _NL_AM_NEWSLETTERS_RULES_DSC);
         $smartOption['template_main'] = "smartmail_admin_newsletter_details.html";
+        smart_close_collapsable('newsletter_rules');
         break;
 }
 if (isset($smartOption['template_main'])) {
