@@ -41,14 +41,54 @@ class SmartmailDispatch extends SmartObject {
     var $ads = array(); //Array of ads
     var $attachments = array();
 
-    function SmartmailDispatch() {
-        $this->initVar("dispatch_id", XOBJ_DTYPE_INT);
-        $this->initVar('newsletterid', XOBJ_DTYPE_INT);
-        $this->initVar("dispatch_time", XOBJ_DTYPE_INT);
-        $this->initVar("dispatch_subject", XOBJ_DTYPE_TXTBOX, "");
-        $this->initVar("dispatch_status", XOBJ_DTYPE_INT, 1); //0 = not ready, 1 = ready to send, 2 = dispatched, 3 = to be sent, 4 = in progress
-        $this->initVar('dispatch_content', XOBJ_DTYPE_TXTAREA, '');
-        $this->initVar('dispatch_receivers', XOBJ_DTYPE_INT, 0);
+    function SmartmailDispatch(&$handler) {
+    	$this->SmartObject($handler);
+
+        $this->quickInitVar('dispatch_id', XOBJ_DTYPE_INT, true);
+        $this->quickInitVar('newsletterid', XOBJ_DTYPE_INT, true, _NL_AM_NEWSLETTER);
+        $this->quickInitVar('dispatch_time', XOBJ_DTYPE_LTIME, false, _NL_AM_TIME);
+        $this->quickInitVar('dispatch_subject', XOBJ_DTYPE_TXTBOX, false, _NL_AM_SUBJECT);
+        $this->quickInitVar('dispatch_status', XOBJ_DTYPE_INT, false, _NL_AM_STATUS); //0 = not ready, 1 = ready to send, 2 = dispatched, 3 = to be sent, 4 = in progress
+        $this->quickInitVar('dispatch_content', XOBJ_DTYPE_TXTAREA, false, _NL_AM_CONTENT);
+        $this->quickInitVar('dispatch_receivers', XOBJ_DTYPE_INT, false, _NL_AM_RECEIVERS);
+    }
+
+    function getVar($key, $format = 's') {
+        if ($format == 's' && in_array($key, array('newsletterid', 'dispatch_status'))) {
+            return call_user_func(array($this,$key));
+        }
+        return parent::getVar($key, $format);
+    }
+
+    function newsletterid() {
+		$smart_registry = SmartObjectsRegistry::getInstance();
+    	$ret = $this->getVar('newsletterid', 'e');
+		$obj = $smart_registry->getSingleObject('newsletter', $ret, 'smartmail');
+
+    	if (!$obj->isNew()) {
+   			$ret = $obj->getAdminViewItemLink();
+    	}
+    	return $ret;
+    }
+
+    function dispatch_status() {
+    	$ret = $this->getVar('dispatch_status', 'e');
+    	switch ($ret) {
+    		case 1:
+    			return _NL_AM_READY;
+    			break;
+    		case 2:
+    			return _NL_AM_DISPATCHED;
+    			break;
+    		default:
+    			return _NL_AM_NOTREADY;
+    	}
+    }
+
+    function getDispatchPreviewLink() {
+    	$js = "javascript: openWithSelfMain('newsletterpreview.php?id=" . $this->id() . "', 'preview', '1000', '700')";
+		$ret = '<a href="' . $js . '"><img src="' . SMARTOBJECT_IMAGES_ACTIONS_URL . 'filefind.png" style="vertical-align: middle;" alt="' . _NL_AM_PREVIEW . '" title="' . _NL_AM_PREVIEW . '" /></a>';
+		return $ret;
     }
 
     /**
@@ -78,12 +118,12 @@ class SmartmailDispatch extends SmartObject {
             $this->assignVar('dispatch_time', $this->getNextDispatch());
         }
         $form->addElement(new XoopsFormHidden('op', 'save'));
-        $form->addElement(new XoopsFormHidden('nid', $this->getVar('newsletterid')));
+        $form->addElement(new XoopsFormHidden('nid', $this->getVar('newsletterid', 'e')));
         $time = new XoopsFormDateTime(_NL_AM_TIME, 'dispatch_time', 15, $this->getVar('dispatch_time'));
         $time->_name = "dispatch_time"; //XOOPS 2.0.13.2 < fix for missing name attribute
         $form->addElement($time);
         $form->addElement(new XoopsFormText(_NL_AM_SUBJECT, 'dispatch_subject', 75, 255, $this->getVar('dispatch_subject', 'e')));
-        $status_radio = new XoopsFormRadio(_NL_AM_STATUS, 'dispatch_status', $this->getVar('dispatch_status'));
+        $status_radio = new XoopsFormRadio(_NL_AM_STATUS, 'dispatch_status', $this->getVar('dispatch_status', 'e'));
         $status_radio->addOption(0, _NL_AM_NOTREADY);
         $status_radio->addOption(1, _NL_AM_READY);
         $status_radio->addOption(2, _NL_AM_DISPATCHED);
@@ -126,6 +166,7 @@ class SmartmailDispatch extends SmartObject {
 	**/
     function build($edit = false) {
         $this->loadNewsletter();
+        $newsletter_id = $this->getVar('newsletterid', 'e');
         //Assign information
         global $xoopsTpl;
         $xoopsTpl->assign('dispatchid', $this->getVar('dispatch_id'));
@@ -137,9 +178,9 @@ class SmartmailDispatch extends SmartObject {
         $xoopsTpl->assign('date', $date);
 
         $newsletterblock_handler = xoops_getmodulehandler('block');
-        $newsletterblocks = $newsletterblock_handler->getByNewsletter($this->getVar('newsletterid'), $this->getVar('dispatch_id'), $edit);
-        if (isset($newsletterblocks[$this->getVar('newsletterid')])) {
-            $xoopsTpl->assign("blocks", $newsletterblocks[$this->getVar('newsletterid')]);
+        $newsletterblocks = $newsletterblock_handler->getByNewsletter($newsletter_id, $this->getVar('dispatch_id'), $edit);
+        if (isset($newsletterblocks[$this->getVar('newsletterid', 'e')])) {
+            $xoopsTpl->assign("blocks", $newsletterblocks[$newsletter_id]);
         }
 
         //Apply template
@@ -228,7 +269,7 @@ class SmartmailDispatch extends SmartObject {
     function loadNewsletter() {
         if (!is_object($this->newsletter)) {
             $newsletter_handler = xoops_getmodulehandler('newsletter', 'smartmail');
-            $this->newsletter = $newsletter_handler->get($this->getVar('newsletterid'));
+            $this->newsletter = $newsletter_handler->get($this->getVar('newsletterid', 'e'));
         }
     }
 
@@ -272,7 +313,7 @@ class SmartmailDispatch extends SmartObject {
 	**/
     function getReceiverList() {
         $smartmail_subscriber_handler = xoops_getmodulehandler('subscriber', 'smartmail');
-        return $smartmail_subscriber_handler->getRecipientList($this->getVar('newsletterid'), $this->newsletter->getVar('newsletter_type'));
+        return $smartmail_subscriber_handler->getRecipientList($this->getVar('newsletterid', 'e'), $this->newsletter->getVar('newsletter_type'));
     }
 
     /**
@@ -284,11 +325,12 @@ class SmartmailDispatch extends SmartObject {
 	 * @return void
 	 */
     function createNextDispatch($start_time = 0, $number = 1) {
+    	$newsletter_id = $this->getVar('newsletterid', 'e');
         $dispatch_handler = xoops_getmodulehandler('dispatch', 'smartmail');
         if ($start_time == 0) {
-            $start_time = $dispatch_handler->getLastDispatchTime($this->getVar('newsletterid'));
+            $start_time = $dispatch_handler->getLastDispatchTime($newsletter_id);
         }
-        $dispatch_handler->createNextDispatch($this->getVar('newsletterid'), $start_time, $number);
+        $dispatch_handler->createNextDispatch($newsletter_id, $start_time, $number);
     }
 
     /**

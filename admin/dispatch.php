@@ -58,15 +58,15 @@ switch ($op) {
         $form->display();
         break;
 
-    case "edit":
-        if (!isset($_REQUEST['id'])) {
+    case "mod":
+        if (!isset($_REQUEST['dispatch_id'])) {
             redirect_header('index.php', 2, _NL_AM_NOSELECTION);
         }
 
 		smart_xoops_cp_header();
 		smart_adminMenu(1);
 
-        $obj =& $handler->get($_REQUEST['id']);
+        $obj =& $handler->get($_REQUEST['dispatch_id']);
         $form =& $obj->getForm(false, _EDIT." ".$typetitle);
         $form->assign($xoopsTpl);
 
@@ -77,7 +77,7 @@ switch ($op) {
 
         //Add block form
         $block_handler = xoops_getmodulehandler('block');
-        $form = $block_handler->getAddBlockForm($obj->getVar('newsletterid'), $_REQUEST['id']);
+        $form = $block_handler->getAddBlockForm($obj->getVar('newsletterid', 'e'), $_REQUEST['dispatch_id']);
         $form->assign($xoopsTpl);
 
         $smartOption['template_main'] = "smartmail_admin_dispatch_edit.html";
@@ -94,7 +94,7 @@ switch ($op) {
         $obj->processFormSubmit();
 
         if ($handler->insert($obj) && $obj->postSave()) {
-            redirect_header('dispatchlist.php?id='.$obj->getVar('newsletterid'), 3, sprintf(_NL_AM_SAVEDSUCCESS, $obj->getVar('dispatch_subject')));
+            redirect_header('dispatchlist.php?id='.$obj->getVar('newsletterid', 'e'), 3, sprintf(_NL_AM_SAVEDSUCCESS, $obj->getVar('dispatch_subject')));
         }
         else {
 
@@ -107,11 +107,11 @@ switch ($op) {
         }
         break;
 
-    case "delete":
-        $obj =& $handler->get($_REQUEST['id']);
+    case "del":
+        $obj =& $handler->get($_REQUEST['dispatch_id']);
         if (isset($_REQUEST['ok']) && $_REQUEST['ok'] == 1) {
             if ($handler->delete($obj)) {
-                redirect_header('dispatchlist.php?id='.intval($obj->getVar('newsletterid')), 3, sprintf(_NL_AM_DELETEDSUCCESS, _NL_AM_DISPATCH));
+                redirect_header('dispatchlist.php?id='.intval($obj->getVar('newsletterid', 'e')), 3, sprintf(_NL_AM_DELETEDSUCCESS, _NL_AM_DISPATCH));
             }
             else {
                 echo implode('<br />', $obj->getErrors());
@@ -121,7 +121,7 @@ switch ($op) {
 			smart_xoops_cp_header();
 			smart_adminMenu(1);
 
-            xoops_confirm(array('ok' => 1, 'id' => $_REQUEST['id'], 'op' => 'delete'), 'dispatch.php', sprintf(_NL_AM_RUSUREDEL, _NL_AM_DISPATCH));
+            xoops_confirm(array('ok' => 1, 'dispatch_id' => $_REQUEST['dispatch_id'], 'op' => 'del'), 'dispatch.php', sprintf(_NL_AM_RUSUREDEL, _NL_AM_DISPATCH));
         }
         break;
 

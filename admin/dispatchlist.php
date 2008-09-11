@@ -25,38 +25,52 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA //
 //  ------------------------------------------------------------------------ //
 include "header.php";
+include_once SMARTOBJECT_ROOT_PATH."class/smartobjecttable.php";
+
 smart_xoops_cp_header();
-smart_adminMenu(1);
 
 $dispatch_handler = xoops_getmodulehandler('dispatch');
-if (isset($_REQUEST['add'])) {
+$newsletter_handler = xoops_getmodulehandler('newsletter', 'smartmail');
 
+if (isset($_REQUEST['add'])) {
     $newsletterid = $_REQUEST['id'] = ($_REQUEST['newsletterid']);
     $number = intval($_REQUEST['number']);
-
     $start_time = $dispatch_handler->getLastDispatchTime($newsletterid);
-
     $dispatch_handler->createNextDispatch($newsletterid, $start_time, $number);
 }
-$newsletter_handler = xoops_getmodulehandler('newsletter', 'smartmail');
+
 $newsletterlist = $newsletter_handler->getList();
+$adminMenu_title = _NL_AM_DISPATCHES_LIST;
 
 $criteria = new CriteriaCompo();
 $criteria->add(new Criteria('dispatch_status', 2, "!="));
 if (isset($_REQUEST['id'])) {
     $criteria->add(new Criteria('newsletterid', intval($_REQUEST['id'])));
+    $newsletterObj = $newsletter_handler->get(intval($_REQUEST['id']));
+    $adminMenu_title .= ' > ' . $newsletterObj->getVar('newsletter_name');
 }
+smart_adminMenu(1, $adminMenu_title);
 
-$criteria->setLimit(15);
 $criteria->setSort("dispatch_time");
 $criteria->setOrder("ASC");
 
-$dispatches = $dispatch_handler->getObjects($criteria, true, false);
-unset($criteria);
-$xoopsTpl->assign('newsletterlist', $newsletterlist);
-$xoopsTpl->assign('objects', $dispatches);
+$collapse_dsc = isset($_REQUEST['id']) ? _NL_AM_DISPATCHES_LIST_FOR_NEWSLETTER_DSC : _NL_AM_DISPATCHES_LIST_DSC;
 
-$smartOption['template_main'] = "smartmail_admin_dispatch_list.html";
+smart_collapsableBar('dispatches_lists', _NL_AM_DISPATCHES_LIST, $collapse_dsc);
+$xoopsTpl->assign('newsletterlist', $newsletterlist);
+$dispatches = $dispatch_handler->getObjects($criteria, true, false);
+$xoopsTpl->display('db:smartmail_admin_dispatch_add_form.html');
+
+$objectTable = new SmartObjectTable($dispatch_handler, $criteria);
+$objectTable->addColumn(new SmartObjectColumn('newsletterid', 'left', 150, 'getNewsletterAdminLink'));
+$objectTable->addColumn(new SmartObjectColumn('dispatch_subject'));
+$objectTable->addColumn(new SmartObjectColumn('dispatch_status'));
+$objectTable->addColumn(new SmartObjectColumn('dispatch_time'));
+
+$objectTable->addCustomAction('getDispatchPreviewLink');
+$objectTable->render();
+unset($criteria);
+smart_close_collapsable('dispatches_lists');
 
 // Dispatched ones, too:
 $criteria = new CriteriaCompo(new Criteria("dispatch_status", 1, ">"));
@@ -72,18 +86,21 @@ $criteria->setOrder("DESC");
 
 $dispatched = $dispatch_handler->getObjects($criteria, true, false);
 $dispatched_count = $dispatch_handler->getCount($criteria);
+
+$collapse_dsc = isset($_REQUEST['id']) ? _NL_AM_SENT_DISPATCHES_LIST_FOR_NEWSLETTER_DSC : _NL_AM_DISPATCHES_LIST_DSC;
+
+smart_collapsableBar('sent_dispatches_lists', _NL_AM_SENT_DISPATCHES_LIST, $collapse_dsc);
+
+$objectTable = new SmartObjectTable($dispatch_handler, $criteria);
+$objectTable->addColumn(new SmartObjectColumn('newsletterid', 'left', 150, 'getNewsletterAdminLink'));
+$objectTable->addColumn(new SmartObjectColumn('dispatch_subject'));
+$objectTable->addColumn(new SmartObjectColumn('dispatch_time'));
+$objectTable->addColumn(new SmartObjectColumn('dispatch_receivers'));
+
+$objectTable->render();
 unset($criteria);
+smart_close_collapsable('sent_dispatches_lists');
 
-$xoopsTpl->assign("dispatched", $dispatched);
-
-include_once XOOPS_ROOT_PATH."/class/pagenav.php";
-$pagenav = new XoopsPageNav($dispatched_count, 30, $start, "start");
-$xoopsTpl->assign('pagenav', $pagenav->renderNav(5));
-
-
-if (isset($smartOption['template_main'])) {
-	$xoopsTpl->display("db:".$smartOption['template_main']);
-}
 smart_modFooter ();
 xoops_cp_footer();
 ?>

@@ -143,6 +143,9 @@ $modversion['templates'][] = array('file' => "smartmail_subscription.html",
 $modversion['templates'][] = array('file' => "smartmail_admin_subscriberlist.html",
                                     'description' => "Subscriber list admin page");
 
+$modversion['templates'][] = array('file' => "smartmail_admin_dispatch_add_form.html",
+                                    'description' => "Add dispatch form");
+
 require_once XOOPS_ROOT_PATH."/class/xoopslists.php";
 $templates = XoopsLists::getFileListAsArray(XOOPS_ROOT_PATH."/modules/".$modversion['dirname']."/templates");
 foreach ($templates as $filename) {

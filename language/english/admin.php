@@ -16,6 +16,9 @@ define("_NL_AM_NEWSLETTERS_LIST_DSC", "Here is a list of all newsletters availab
 define("_NL_AM_SUBSCRIBERS", "Subscribers");
 define("_NL_AM_NEWSLETTER_ADD", "Add Newsletter");
 
+define("_NL_AM_NEWSLETTERS_DETAILS", "Details of '%s' newsletter");
+define("_NL_AM_NEWSLETTERS_RULES", "Rules of '%s' newsletter");
+define("_NL_AM_NEWSLETTERS_RULES_DSC", "Use the following form to add or delete rules related to this newsletter.");
 define("_NL_AM_NEWSLETTERRULE", "Rule");
 define("_NL_AM_NEWSLETTERRULES", "Rules");
 define("_NL_AM_WEEKDAY", "Weekday");
@@ -30,6 +33,12 @@ define("_NL_AM_TYPE_ALL", "All users of the site");
 // Dispatch
 define("_NL_AM_DISPATCH", "Dispatch");
 define("_NL_AM_DISPATCHES", "Dispatches");
+define("_NL_AM_DISPATCHES_LIST", "Dispatches List");
+define("_NL_AM_DISPATCHES_LIST_DSC", "Here is a list of all dispatches which have not been sent yet.");
+define("_NL_AM_DISPATCHES_LIST_FOR_NEWSLETTER_DSC", "Here is a list of all dispatches of this newsletter which have not been sent yet.");
+define("_NL_AM_SENT_DISPATCHES_LIST", "Sent Dispatches");
+define("_NL_AM_SENT_DISPATCHES_LIST_DSC", "Here is a list of all sent dispatches.");
+define("_NL_AM_SENT_DISPATCHES_LIST_FOR_NEWSLETTER_DSC", "Here is a list of all sent dispatches of this newsletter.");
 define("_NL_AM_SUBJECT", "Subject");
 define("_NL_AM_LATESTDISPATCHES", "Latest dispatches");
 define("_NL_AM_PREVIEW", "Preview");
