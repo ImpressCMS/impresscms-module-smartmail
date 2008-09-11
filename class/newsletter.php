@@ -43,9 +43,9 @@ class SmartmailNewsletter extends SmartObject {
 
     	$this->SmartObject($handler);
 
-        $this->quickInitVar("newsletter_id", XOBJ_DTYPE_INT);
-        $this->quickInitVar("newsletter_name", XOBJ_DTYPE_TXTBOX, true, _NL_AM_NAME);
-        $this->quickInitVar("newsletter_description", XOBJ_DTYPE_TXTAREA, false, _NL_AM_DESCRIPTION);
+        $this->quickInitVar('newsletter_id', XOBJ_DTYPE_INT);
+        $this->quickInitVar('newsletter_name', XOBJ_DTYPE_TXTBOX, true, _NL_AM_NAME);
+        $this->quickInitVar('newsletter_description', XOBJ_DTYPE_TXTAREA, false, _NL_AM_DESCRIPTION);
         $this->quickInitVar('newsletter_template', XOBJ_DTYPE_TXTBOX, false, _NL_AM_TEMPLATE);
         $this->quickInitVar('newsletter_from_name', XOBJ_DTYPE_TXTBOX, false, _NL_AM_FROMNAME);
         $this->quickInitVar('newsletter_from_email', XOBJ_DTYPE_TXTBOX, false, _NL_AM_FROMEMAIL);
