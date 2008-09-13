@@ -25,8 +25,6 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA //
 //  ------------------------------------------------------------------------ //
 include "header.php";
-smart_xoops_cp_header();
-smart_adminMenu(0);
 
 $handler = xoops_getmodulehandler('newsletter');
 $typetitle = _NL_AM_NEWSLETTER;
@@ -38,9 +36,12 @@ $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : redirect_header("javasc
 switch ($op) {
     default:
     case "blocks":
+		smart_xoops_cp_header();
+		smart_adminMenu(0);
+
         $newsletter = $handler->get($id);
         $newsletterblock_handler = xoops_getmodulehandler('block');
-        $newsletterblocks = $newsletterblock_handler->getByNewsletter($newsletter->getVar('newsletter_id'));
+        $newsletterblocks = $newsletterblock_handler->getByNewsletter($newsletter->id());
 
         //Add block form
         $form = $newsletterblock_handler->getAddBlockForm($id);
@@ -48,14 +49,17 @@ switch ($op) {
         $form->assign($xoopsTpl);
         if (isset($newsletterblocks[$newsletter->getVar('newsletter_id')])) {
             ksort($newsletterblocks[$newsletter->getVar('newsletter_id')]);
-            $xoopsTpl->assign('blocks', $newsletterblocks[$newsletter->getVar('newsletter_id')]);
+            $xoopsTpl->assign('blocks', $newsletterblocks[$newsletter->id()]);
         }
-        $xoopsTpl->assign("newsletterid", $newsletter->getVar('newsletter_id'));
+        $xoopsTpl->assign("newsletterid", $newsletter->id());
         $smartOption['template_main'] = "smartmail_admin_block_list.html";
 
         break;
 
     case "block":
+		smart_xoops_cp_header();
+		smart_adminMenu(0);
+
         $block_handler =& xoops_gethandler('block');
         $newsletterblock_handler = xoops_getmodulehandler('block');
 
