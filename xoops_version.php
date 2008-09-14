@@ -18,8 +18,8 @@ if (defined("ICMS_ROOT_PATH")) {
 	/**
 	 * For now, let's manually include icms_version.php. In ImpressCMS 1.2, this shall be done automatically of course :-)'
 	 */
-	global $modversion;
-	include_once('icms_version.php');
+	//global $modversion;
+	include(dirname( __FILE__ ) . '/icms_version.php');
 } else{
 	$modversion['name'] = _NL_MI_NAME;
 	$modversion['version'] = 0.81;
